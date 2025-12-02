@@ -1,0 +1,68 @@
+# Maven target directory
+/target/
+
+# Maven wrapper files
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+!/.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code settings
+.vscode/
+
+# Eclipse files
+.project
+.classpath
+.settings/
+.springBeans
+.factorypath
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Built JAR/WAR files created by Spring Boot packaging
+*.original
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Test coverage reports
+/coverage/
+*.lcov
+
+# Local environment configuration
+.env
+.env.*
+application-*.yml
+application-*.properties
+
+# Spring Boot devtools
+.spring-boot-devtools.properties
+
+# Build cache
+/.gradle/
+!.mvn/
+
+# Lombok
+lombok.config
+
+# Docker
+docker-compose.override.yml
