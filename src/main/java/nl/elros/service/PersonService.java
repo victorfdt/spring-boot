@@ -1,63 +1,73 @@
 package nl.elros.service;
 
+import nl.elros.exception.ResourceNotFoundException;
 import nl.elros.model.Person;
+import nl.elros.repository.PersonRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
 
 @Service
 public class PersonService {
 
-    private final AtomicLong counter = new AtomicLong();
-    private final Logger logger = Logger.getLogger(PersonService.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(PersonService.class);
+    private final PersonRepository repository;
 
-    public Person findById(String id) {
-        logger.info("Find person by id: " + id);
-        return Person.builder()
-                .id(counter.incrementAndGet())
-                .firstName("John")
-                .lastName("Doe")
-                .address("Somewhere over the rainbow")
-                .gender("MALE")
-                .build();
+    public PersonService(PersonRepository repository) {
+        this.repository = repository;
     }
 
+    @Transactional(readOnly = true)
+    public Person findById(Long id) {
+        log.debug("Finding person by id={}", id);
+        return getExistingPerson(id);
+    }
+
+    @Transactional(readOnly = true)
     public List<Person> findAll() {
-        logger.info("Find all");
-        Person person1 = Person.builder()
-                .id(counter.incrementAndGet())
-                .firstName("Jane")
-                .lastName("Doe")
-                .address("Somewhere over the rainbow")
-                .gender("FEMALE")
-                .build();
-
-        Person person2 = Person.builder()
-                .id(counter.incrementAndGet())
-                .firstName("Jane")
-                .lastName("Doe")
-                .address("Somewhere over the rainbow")
-                .gender("FEMALE")
-                .build();
-
-
-        return List.of(person1, person2);
+        log.debug("Finding all persons");
+        return repository.findAll();
     }
 
+    @Transactional
     public Person create(Person person) {
-        logger.info("Create person: " + person);
-        person.setId(counter.incrementAndGet());
-        return person;
+        if (person == null) {
+            throw new IllegalArgumentException("Person must not be null");
+        }
+        log.debug("Creating person");
+        return repository.save(person);
     }
 
+    @Transactional
     public Person update(Person person) {
-        logger.info("Update person: " + person);
-        return person;
+        if (person == null) {
+            throw new IllegalArgumentException("Person must not be null");
+        }
+        if (person.getId() == null) {
+            throw new IllegalArgumentException("Person id must not be null for update");
+        }
+
+        log.debug("Updating person id={}", person.getId());
+        getExistingPerson(person.getId());
+
+        return repository.save(person);
     }
 
-    public void delete(String id) {
-        logger.info("Delete person: " + id);
+    @Transactional
+    public void delete(Long id) {
+        log.debug("Deleting person id={}", id);
+        getExistingPerson(id);
+        repository.deleteById(id);
+    }
+
+    private Person getExistingPerson(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("id must not be null");
+        }
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Person with id " + id + " not found"));
     }
 }

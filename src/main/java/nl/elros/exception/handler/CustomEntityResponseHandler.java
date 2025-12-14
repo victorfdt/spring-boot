@@ -1,7 +1,7 @@
 package nl.elros.exception.handler;
 
+import nl.elros.exception.ResourceNotFoundException;
 import nl.elros.exception.ResponseException;
-import nl.elros.exception.UnsupportedMathOperationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,15 +24,15 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
         return new ResponseEntity<>(responseException, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(UnsupportedMathOperationException.class)
-    public final ResponseEntity<ResponseException> handleUnsupportedMathOperationException(
-            UnsupportedMathOperationException unsupportedMathOperationException,
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public final ResponseEntity<ResponseException> handleRecourseNotFoundException(
+            ResourceNotFoundException unsupportedMathOperationException,
             WebRequest request) {
         ResponseException responseException = new ResponseException(
                 LocalDateTime.now(),
                 unsupportedMathOperationException.getMessage(),
                 request.getDescription(false));
 
-        return new ResponseEntity<>(responseException, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(responseException, HttpStatus.NOT_FOUND);
     }
 }
